@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:torch_light/torch_light.dart';
+import 'dart:io';
 
 void main() {
   runApp(MaterialApp(
@@ -37,11 +39,32 @@ class _MorseCodeMainState extends State<MorseCodeMain> {
   String morse_parser(String text_to_convert){
     String morse = "";
     for (var x = 0; x < text_to_convert.length ;++x){
-      print(text_to_convert[x]);
       morse += MorseMap[text_to_convert[x]]!;
       morse += "   ";
     }
     return morse;
+  }
+
+  void morse_flasher(morse) {
+    for (var x = 0; x < morse.length ;++x){
+      String unit = morse[x];
+      if (unit == ".") {
+        //blink 1s
+        TorchLight.enableTorch();
+        sleep(const Duration(milliseconds:200*1));
+        TorchLight.disableTorch();
+      }
+      else if (unit == "-") {
+        //blink for 3s
+        TorchLight.enableTorch();
+        sleep(const Duration(milliseconds:200*3));
+        TorchLight.disableTorch();
+      }
+      else if (unit == " ") {
+        //wait for 1s (time.sleep 1s or something)
+        sleep(const Duration(milliseconds:200*1));
+      }
+    }
   }
 
   @override
@@ -83,7 +106,8 @@ class _MorseCodeMainState extends State<MorseCodeMain> {
                   controller: textController,
                   onSubmitted: (value){
                     setState(() {
-                      Morse = morse_parser(value.toUpperCase()); // the text from controller must be passed to a morse parser function and then to a flash function
+                      Morse = morse_parser(value.toUpperCase());
+                      morse_flasher(Morse);// the text from controller must be passed to a morse parser function and then to a flash function
                     });
                   },
                   cursorColor: Colors.black,
@@ -95,7 +119,8 @@ class _MorseCodeMainState extends State<MorseCodeMain> {
                       icon: Icon(Icons.send),
                       onPressed: (){
                         setState(() {
-                          Morse = morse_parser(textController.text.toUpperCase()); // the text from controller must be passed to a morse parser function and then to a flash function
+                          Morse = morse_parser(textController.text.toUpperCase());
+                          morse_flasher(Morse);// the text from controller must be passed to a morse parser function and then to a flash function
                         });
                       },
                     ),
